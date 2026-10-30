@@ -17,10 +17,14 @@ export default function Page() {
   const [additionalTagOptions, setAdditionalTagOptions] = useState<string[]>(
     []
   );
+  const [relationshipTagOptions, setRelationshipTagOptions] = useState<
+    string[]
+  >([]);
   const [search, setSearch] = useState("");
   const [author, setAuthor] = useState("");
   const [workId, setWorkId] = useState("");
   const [additionalTags, setAdditionalTags] = useState<string[]>([]);
+  const [relationshipTags, setRelationshipTags] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
@@ -39,6 +43,7 @@ export default function Page() {
     if (author) params.set("author", author);
     if (workId) params.set("workId", workId);
     additionalTags.forEach((t) => params.append("additionalTags", t));
+    relationshipTags.forEach((t) => params.append("relationshipTags", t));
     if (sortBy) params.set("sortBy", sortBy);
     params.set("sortDir", sortDir);
     params.set("page", String(page));
@@ -57,6 +62,7 @@ export default function Page() {
       setLinkColumns(data.linkColumns);
       setAuthors(data.authors);
       setAdditionalTagOptions(data.tagOptions?.additional || []);
+      setRelationshipTagOptions(data.tagOptions?.relationship || []);
       setTotalPages(data.totalPages);
       setTotal(data.total);
       if (!sortBy && data.sortBy) setSortBy(data.sortBy);
@@ -71,6 +77,7 @@ export default function Page() {
     author,
     workId,
     additionalTags,
+    relationshipTags,
     sortBy,
     sortDir,
     page,
@@ -85,7 +92,7 @@ export default function Page() {
   useEffect(() => {
     setPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [search, author, workId, additionalTags, sortBy, sortDir]);
+  }, [search, author, workId, additionalTags, relationshipTags, sortBy, sortDir]);
 
   const columnClass = (col: string) =>
     col.toLowerCase() === "summary" ? "col-summary" : undefined;
@@ -162,6 +169,14 @@ export default function Page() {
               </option>
             ))}
           </select>
+        )}
+        {relationshipTagOptions.length > 0 && (
+          <MultiSelectDropdown
+            label="Relationships"
+            options={relationshipTagOptions}
+            selected={relationshipTags}
+            onChange={setRelationshipTags}
+          />
         )}
         {additionalTagOptions.length > 0 && (
           <MultiSelectDropdown
@@ -326,9 +341,10 @@ export default function Page() {
                 ID...&quot; search if you have it.
               </p>
               <p>
-                You can also filter by author, or by any number of additional
-                tags (though you&apos;ll need to write down the tag to look
-                for it).
+                You can also filter by author, by any number of relationships
+                (pick them from the &quot;Relationships&quot; list), or by any
+                number of additional tags (though you&apos;ll need to write
+                down the tag to look for it).
               </p>
               <p>Have fun!</p>
             </div>

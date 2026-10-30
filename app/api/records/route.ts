@@ -247,6 +247,10 @@ export async function GET(req: NextRequest) {
       ? await loadTagOptions(addlTagsCol)
       : [];
 
+    const relationshipTagOptions = relTagsCol
+      ? await loadTagOptions(relTagsCol)
+      : [];
+
     return NextResponse.json({
       rows: result.rows,
       columns: displayColumns,
@@ -254,6 +258,7 @@ export async function GET(req: NextRequest) {
       authors,
       tagOptions: {
         additional: additionalTagOptions,
+        relationship: relationshipTagOptions,
       },
       sortBy: orderColumn,
       sortDir: sortDir.toLowerCase(),
