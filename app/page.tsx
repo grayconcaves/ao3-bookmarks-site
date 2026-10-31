@@ -347,6 +347,18 @@ export default function Page() {
                 ID...&quot; search if you have it.
               </p>
               <p>
+                Some fics are listed but cannot be downloaded because the author
+                has asked to opt out of sharing outside of Ao3. If you really want
+                a copy of these fics, please DM or tag me on Discord.
+              </p>
+              <p>
+                If you are an author who wants your fic files removed from this site, 
+                please send me a DM as well. Your fics will remain listed for record
+                keeping, but files will no longer be downloadable. I will still retain
+                downloaded copies in my Drive but I will only share them individually,
+                on demand.
+              </p>
+              <p>
                 You can also filter by author, by any number of relationships
                 (pick them from the &quot;Relationships&quot; list), or by any
                 number of additional tags (though you&apos;ll need to write
