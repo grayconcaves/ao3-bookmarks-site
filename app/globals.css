@@ -424,6 +424,15 @@ tbody tr.selected td {
   background: #1fa155;
 }
 
+.btn-opted-out {
+  background: #9a9a9a;
+  cursor: help;
+}
+
+.btn-opted-out:hover {
+  opacity: 1;
+}
+
 .pagination {
   display: flex;
   align-items: center;

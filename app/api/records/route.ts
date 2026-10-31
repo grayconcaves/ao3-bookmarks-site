@@ -14,7 +14,7 @@ const ADDITIONAL_TAGS_COL =
 // Columns to fetch (for buttons/links) but never show as plain data columns.
 const HIDDEN_COLUMNS = (
   process.env.DB_HIDDEN_COLUMNS ||
-  "id,work_id,relationship_tags,additional_tags,summary"
+  "id,work_id,relationship_tags,additional_tags,summary,opt_out"
 )
   .split(",")
   .map((c) => c.trim().toLowerCase())
@@ -24,6 +24,9 @@ const HIDDEN_COLUMNS = (
 const AO3_LINK_COL = process.env.DB_AO3_LINK_COLUMN || "ao3_link";
 const EPUB_LINK_COL = process.env.DB_EPUB_LINK_COLUMN || "epub_link";
 const PDF_LINK_COL = process.env.DB_PDF_LINK_COLUMN || "pdf_link";
+// Boolean column: when TRUE the author opted out of file sharing, so the
+// EPUB/PDF links are stripped server-side and never sent to the browser.
+const OPT_OUT_COL = process.env.DB_OPT_OUT_COLUMN || "opt_out";
 
 const DEFAULT_PAGE_SIZE = 50;
 
@@ -216,6 +219,18 @@ export async function GET(req: NextRequest) {
     const query = `SELECT * FROM ${quoteIdent(TABLE)} ${whereClause} ${orderClause} LIMIT $${limitIdx} OFFSET $${offsetIdx}`;
     const result = await client.query(query, [...values, pageSize, offset]);
 
+    // Strip file links for opted-out works so they can't be reached from the
+    // API response or page source; expose a normalized opted_out flag instead.
+    const optOutCol = resolveColumn(validColumns, OPT_OUT_COL);
+    const rows = result.rows.map((row) => {
+      const optedOut = optOutCol ? row[optOutCol] === true : false;
+      if (!optedOut) return { ...row, opted_out: false };
+      const clean = { ...row, opted_out: true };
+      if (linkColumns.epub) clean[linkColumns.epub] = null;
+      if (linkColumns.pdf) clean[linkColumns.pdf] = null;
+      return clean;
+    });
+
     let authors: string[] = [];
     if (validColumns.includes(AUTHOR_COL)) {
       const authorsRes = await client.query(
@@ -252,7 +267,7 @@ export async function GET(req: NextRequest) {
       : [];
 
     return NextResponse.json({
-      rows: result.rows,
+      rows,
       columns: displayColumns,
       linkColumns,
       authors,

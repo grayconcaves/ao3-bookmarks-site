@@ -215,7 +215,7 @@ export default function Page() {
               >
                 {columns.map((col) => (
                   <td key={col} className={columnClass(col)} data-label={col}>
-                    {renderCell(col, row[col], linkColumns)}
+                    {renderCell(col, row[col], linkColumns, row.opted_out === true)}
                   </td>
                 ))}
               </tr>
@@ -263,13 +263,19 @@ export default function Page() {
                   "Ao3 ↗",
                   "btn-blue"
                 )}
-              {linkColumns.epub &&
+              {selectedRow.opted_out === true &&
+                (linkColumns.epub || linkColumns.pdf) && (
+                  <OptedOutBadge small />
+                )}
+              {selectedRow.opted_out !== true &&
+                linkColumns.epub &&
                 modalLinkButton(
                   getRowValue(selectedRow, linkColumns.epub),
                   "EPUB",
                   "btn-orange"
                 )}
-              {linkColumns.pdf &&
+              {selectedRow.opted_out !== true &&
+                linkColumns.pdf &&
                 modalLinkButton(
                   getRowValue(selectedRow, linkColumns.pdf),
                   "PDF",
@@ -481,12 +487,30 @@ function MultiSelectDropdown({
 function renderCell(
   col: string,
   value: unknown,
-  linkColumns: LinkColumns
+  linkColumns: LinkColumns,
+  optedOut = false
 ): React.ReactNode {
   if (col === linkColumns.ao3) return linkButton(value, "Read on AO3", "btn-blue");
+  if (optedOut && (col === linkColumns.epub || col === linkColumns.pdf))
+    return <OptedOutBadge />;
   if (col === linkColumns.epub) return linkButton(value, "Download EPUB", "btn-orange");
   if (col === linkColumns.pdf) return linkButton(value, "Download PDF", "btn-green");
   return formatCell(value);
+}
+
+const OPT_OUT_TOOLTIP = "Author opted out of file sharing";
+
+function OptedOutBadge({ small = false }: { small?: boolean }) {
+  return (
+    <span
+      className={`btn btn-opted-out${small ? " btn-small" : ""}`}
+      title={OPT_OUT_TOOLTIP}
+      aria-label={`Opted Out: ${OPT_OUT_TOOLTIP}`}
+      onClick={(e) => e.stopPropagation()}
+    >
+      Opted Out
+    </span>
+  );
 }
 
 function modalLinkButton(value: unknown, label: string, className: string) {
