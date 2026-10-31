@@ -491,8 +491,10 @@ function renderCell(
   optedOut = false
 ): React.ReactNode {
   if (col === linkColumns.ao3) return linkButton(value, "Read on AO3", "btn-blue");
-  if (optedOut && (col === linkColumns.epub || col === linkColumns.pdf))
-    return <OptedOutBadge />;
+  if (optedOut && col === linkColumns.epub)
+    return <OptedOutBadge sizeAs="Download EPUB" />;
+  if (optedOut && col === linkColumns.pdf)
+    return <OptedOutBadge sizeAs="Download PDF" />;
   if (col === linkColumns.epub) return linkButton(value, "Download EPUB", "btn-orange");
   if (col === linkColumns.pdf) return linkButton(value, "Download PDF", "btn-green");
   return formatCell(value);
@@ -500,15 +502,30 @@ function renderCell(
 
 const OPT_OUT_TOOLTIP = "Author opted out of file sharing";
 
-function OptedOutBadge({ small = false }: { small?: boolean }) {
+// sizeAs: label of the button being replaced. It's rendered invisibly so the
+// badge takes exactly that button's width, with "Opted Out" centred on top.
+function OptedOutBadge({
+  small = false,
+  sizeAs,
+}: {
+  small?: boolean;
+  sizeAs?: string;
+}) {
   return (
     <span
-      className={`btn btn-opted-out${small ? " btn-small" : ""}`}
+      className={`btn btn-opted-out${small ? " btn-small" : ""}${
+        sizeAs ? " btn-opted-out-sized" : ""
+      }`}
       title={OPT_OUT_TOOLTIP}
       aria-label={`Opted Out: ${OPT_OUT_TOOLTIP}`}
       onClick={(e) => e.stopPropagation()}
     >
-      Opted Out
+      {sizeAs && (
+        <span className="btn-sizer" aria-hidden="true">
+          {sizeAs}
+        </span>
+      )}
+      <span className="btn-label">Opted Out</span>
     </span>
   );
 }

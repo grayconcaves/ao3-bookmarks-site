@@ -433,6 +433,22 @@ tbody tr.selected td {
   opacity: 1;
 }
 
+/* Stack an invisible sizer label and the visible label in one grid cell so
+   the badge matches the width of the button it replaces. */
+.btn-opted-out-sized {
+  display: inline-grid;
+}
+
+.btn-opted-out-sized > .btn-sizer,
+.btn-opted-out-sized > .btn-label {
+  grid-area: 1 / 1;
+  text-align: center;
+}
+
+.btn-sizer {
+  visibility: hidden;
+}
+
 .pagination {
   display: flex;
   align-items: center;
